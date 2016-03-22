@@ -69,18 +69,3 @@
   ```
 
   Go to <http://localhost:8080/> to see your "Hello Docker World" message.
-
-6. Containerize It
-  ```
-  touch src/main/docker/Dockerfile
-  atom src/main/docker/Dockerfile
-  ```
-  Add the following
-  ```
-  FROM frolvlad/alpine-oraclejdk8:slim
-  VOLUME /tmp
-  ADD gs-spring-boot-docker-0.1.0.jar app.jar
-  RUN bash -c 'touch /app.jar'
-  ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
-  ```
-  
