@@ -69,3 +69,65 @@
   ```
 
   Go to <http://localhost:8080/> to see your "Hello Docker World" message.
+
+6. Containerize It
+  ```
+  touch src/main/docker/Dockerfile
+  atom src/main/docker/Dockerfile
+  ```
+  Add the following
+  ```
+  FROM frolvlad/alpine-oraclejdk8:slim
+  VOLUME /tmp
+  ADD gs-spring-boot-docker-0.1.0.jar app.jar
+  RUN sh -c 'touch /app.jar'
+  ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+  ```
+7. Update the Gradle build script
+    ```
+    buildscript {
+    ...
+      dependencies {
+          ...
+          classpath('se.transmode.gradle:gradle-docker:1.2')
+      }
+    }
+
+    group = 'channie'
+
+    ...
+    apply plugin: 'docker'
+
+    task buildDocker(type: Docker, dependsOn: build) {
+      push = false
+      applicationName = jar.baseName
+      dockerfile = file('src/main/docker/Dockerfile')
+      doFirst {
+        copy {
+          from jar
+          into stageDir
+        }
+      }
+    }
+    ```
+8. Build it and push it
+  ```
+  gradle build buildDocker
+  ```
+
+9. Run it
+  ```
+  docker run -p 8080:8080 -t channie/gs-spring-boot-docker
+  ```
+  Your app will be available on <http://localhost:8080/>
+
+  **Although...**
+
+  On a mac its not likely to be on localhost, run...
+  ```
+  docker-machine ip name-of-your-docker-env
+  ```
+
+  This will give you the ip of your docker machine environment, which will still be exposed on 8080 i.e.
+
+  <http://docker-machine-ip:8080/>
